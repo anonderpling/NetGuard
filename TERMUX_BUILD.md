@@ -24,10 +24,17 @@ java -version
 ## 3) Get the source code
 
 If you already have this repository folder, go to it.  
-Otherwise clone:
+Otherwise clone (this fork):
 
 ```sh
 git clone https://github.com/Ayanprogrammer11/NetGuard.git
+cd NetGuard
+```
+
+If you want the original upstream project instead, replace the URL with:
+
+```sh
+git clone https://github.com/M66B/NetGuard.git
 cd NetGuard
 ```
 
@@ -43,9 +50,9 @@ chmod +x ./gradlew
 ./gradlew assembleDebug
 ```
 
-Output APK:
+Output APK (AGP naming can vary by version/configuration):
 
-`app/build/outputs/apk/debug/NetGuard-debug.apk`
+`app/build/outputs/apk/debug/*.apk`
 
 ## 6) Install the APK on your phone
 
@@ -53,10 +60,10 @@ From Termux:
 
 ```sh
 termux-setup-storage
-cp app/build/outputs/apk/debug/NetGuard-debug.apk ~/storage/downloads/
+cp app/build/outputs/apk/debug/*.apk ~/storage/downloads/
 ```
 
-Then install `NetGuard-debug.apk` from your Downloads folder (allow install from unknown sources when prompted).
+Then install the copied debug APK from your Downloads folder (allow install from unknown sources when prompted).
 
 ## 7) Optional: build other variants
 
