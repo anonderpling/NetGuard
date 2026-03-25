@@ -30,8 +30,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import androidx.preference.PreferenceManager;
-
 import com.android.vending.billing.IInAppBillingService;
 
 import org.json.JSONException;
@@ -176,41 +174,11 @@ public class IAB implements ServiceConnection {
     }
 
     public static boolean isPurchased(String sku, Context context) {
-        try {
-            if (Util.isDebuggable(context)) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                return !prefs.getBoolean("debug_iab", false);
-            }
-
-            SharedPreferences prefs = context.getSharedPreferences("IAB", Context.MODE_PRIVATE);
-            if (ActivityPro.SKU_SUPPORT1.equals(sku) || ActivityPro.SKU_SUPPORT2.equals(sku))
-                return prefs.getBoolean(sku, false);
-
-            return (prefs.getBoolean(sku, false) ||
-                    prefs.getBoolean(ActivityPro.SKU_PRO1, false) ||
-                    prefs.getBoolean(ActivityPro.SKU_SUPPORT1, false) ||
-                    prefs.getBoolean(ActivityPro.SKU_SUPPORT2, false) ||
-                    prefs.getBoolean(ActivityPro.SKU_DONATION, false));
-        } catch (SecurityException ignored) {
-            return false;
-        }
+        return true;
     }
 
     public static boolean isPurchasedAny(Context context) {
-        try {
-            if (Util.isDebuggable(context)) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                return !(prefs.getBoolean("debug_iab", false));
-            }
-
-            SharedPreferences prefs = context.getSharedPreferences("IAB", Context.MODE_PRIVATE);
-            for (String key : prefs.getAll().keySet())
-                if (prefs.getBoolean(key, false))
-                    return true;
-            return false;
-        } catch (SecurityException ignored) {
-            return false;
-        }
+        return true;
     }
 
     public static String getResult(int responseCode) {
