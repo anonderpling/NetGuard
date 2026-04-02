@@ -177,7 +177,7 @@ jobs:
             --no-daemon \
             --stacktrace \
             -x lint \
-            --warning-mode=all
+            --warning-mode=all --info
             
       - name: Verify APK output
         run: |
