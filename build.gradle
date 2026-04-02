@@ -3,7 +3,6 @@
 buildscript {
     repositories {
         google()
-        jcenter()
     }
     dependencies {
         // http://tools.android.com/tech-docs/new-build-system/gradle-experimental
@@ -18,7 +17,6 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         mavenCentral()
         maven {
             url 'https://maven.google.com'
