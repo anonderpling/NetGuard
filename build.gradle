@@ -4,6 +4,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        gradlePluginPortal()
     }
     dependencies {
         // http://tools.android.com/tech-docs/new-build-system/gradle-experimental
@@ -18,7 +19,15 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
+        all { ArtifactRepository repo ->
+            println repo.url.toString()
+            if (repo.url.toString().startsWith("https://jcenter.bintray.com/")) {
+                project.logger.warn "Repository ${repo.url} removed."
+                remove repo
+                mavenCentral()
+            }
+        }
+        gradlePluginPortal() // add this if you get further errors 
         mavenCentral()
         maven {
             url 'https://maven.google.com'
