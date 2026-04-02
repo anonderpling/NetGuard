@@ -95,8 +95,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private AlertDialog dialogLegend = null;
     private AlertDialog dialogAbout = null;
 
-    private IAB iab = null;
-
     private static final int REQUEST_VPN = 1;
     private static final int REQUEST_INVITE = 2;
     public static final int REQUEST_ROAMING = 3;
@@ -429,36 +427,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         // Fill application list
         updateApplicationList(getIntent().getStringExtra(EXTRA_SEARCH));
 
-        // Update IAB SKUs
-        try {
-            iab = new IAB(new IAB.Delegate() {
-                @Override
-                public void onReady(IAB iab) {
-                    try {
-                        iab.updatePurchases();
-
-                        if (!IAB.isPurchased(ActivityPro.SKU_LOG, ActivityMain.this))
-                            prefs.edit().putBoolean("log", false).apply();
-                        if (!IAB.isPurchased(ActivityPro.SKU_THEME, ActivityMain.this)) {
-                            if (!"teal".equals(prefs.getString("theme", "teal")))
-                                prefs.edit().putString("theme", "teal").apply();
-                        }
-                        if (!IAB.isPurchased(ActivityPro.SKU_NOTIFY, ActivityMain.this))
-                            prefs.edit().putBoolean("install", false).apply();
-                        if (!IAB.isPurchased(ActivityPro.SKU_SPEED, ActivityMain.this))
-                            prefs.edit().putBoolean("show_stats", false).apply();
-                    } catch (Throwable ex) {
-                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    } finally {
-                        iab.unbind();
-                    }
-                }
-            }, this);
-            iab.bind();
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-        }
-
         // Support
         LinearLayout llSupport = findViewById(R.id.llSupport);
         TextView tvSupport = findViewById(R.id.tvSupport);
@@ -513,9 +481,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
         PackageManager pm = getPackageManager();
         LinearLayout llSupport = findViewById(R.id.llSupport);
-        llSupport.setVisibility(
-                IAB.isPurchasedAny(this) || getIntentPro(this).resolveActivity(pm) == null
-                        ? View.GONE : View.VISIBLE);
+        llSupport.setVisibility(View.GONE);
 
         boolean canNotify =
                 (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
@@ -603,11 +569,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         if (dialogAbout != null) {
             dialogAbout.dismiss();
             dialogAbout = null;
-        }
-
-        if (iab != null) {
-            iab.unbind();
-            iab = null;
         }
 
         super.onDestroy();
@@ -832,10 +793,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             searchView.setQuery(search, true);
         }
 
-        markPro(menu.findItem(R.id.menu_log), ActivityPro.SKU_LOG);
-        if (!IAB.isPurchasedAny(this))
-            markPro(menu.findItem(R.id.menu_pro), null);
-
         if (!Util.hasValidFingerprint(this) || getIntentInvite(this).resolveActivity(pm) == null)
             menu.removeItem(R.id.menu_invite);
 
@@ -845,16 +802,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         menu.findItem(R.id.menu_apps).setEnabled(getIntentApps(this).resolveActivity(pm) != null);
 
         return true;
-    }
-
-    private void markPro(MenuItem menu, String sku) {
-        if (sku == null || !IAB.isPurchased(sku, this)) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean dark = prefs.getBoolean("dark_theme", false);
-            SpannableStringBuilder ssb = new SpannableStringBuilder("  " + menu.getTitle());
-            ssb.setSpan(new ImageSpan(this, dark ? R.drawable.ic_shopping_cart_white_24dp : R.drawable.ic_shopping_cart_black_24dp), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            menu.setTitle(ssb);
-        }
     }
 
     @Override
@@ -934,9 +881,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
             case R.id.menu_log:
                 if (Util.canFilter(this))
-                    if (IAB.isPurchased(ActivityPro.SKU_LOG, this))
-                        startActivity(new Intent(this, ActivityLog.class));
-                    else
                         startActivity(new Intent(this, ActivityPro.class));
                 else
                     Toast.makeText(this, R.string.msg_unavailable, Toast.LENGTH_SHORT).show();

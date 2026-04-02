@@ -71,9 +71,6 @@ public class ServiceTileGraph extends TileService implements SharedPreferences.O
         // Check state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean stats = !prefs.getBoolean("show_stats", false);
-        if (stats && !IAB.isPurchased(ActivityPro.SKU_SPEED, this))
-            Toast.makeText(this, R.string.title_pro_feature, Toast.LENGTH_SHORT).show();
-        else
             prefs.edit().putBoolean("show_stats", stats).apply();
         ServiceSinkhole.reloadStats("tile", this);
     }
