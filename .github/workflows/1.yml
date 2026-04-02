@@ -165,6 +165,19 @@ jobs:
           
           echo "Modified build.gradle to build only arm64-v8a"
       
+      - name: scan gradle
+        run: |
+          # Make gradlew executable
+          chmod +x gradlew
+          
+          # Use the arm64-v8a specific build configuration
+          ./gradlew assembleRelease \
+            -Pandroid.injected.invoked.from.ide=true \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m" \
+            --no-daemon \
+            -x lint \
+            --warning-mode=all --scan
+            
       - name: Build ARM64-V8A Release APK
         run: |
           # Make gradlew executable
